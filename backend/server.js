@@ -133,7 +133,7 @@ async function generateQuestions(transcript) {
     }
 }
 
-app.post("/", async (req, res) => {
+app.post("/get-transcript", async (req, res) => {
     const { videoId } = req.body;
     if (!videoId) {
         return res.status(400).json({ error: "Video ID is required" });
@@ -142,9 +142,9 @@ app.post("/", async (req, res) => {
         const transcript = await getYouTubeTranscript(videoId);
         
         // Check if transcript is an error object
-        if (transcript && transcript.error) {
-            return res.status(404).json({ error: transcript.error });
-        }
+        // if (transcript && transcript.error) {
+        //     return res.status(404).json({ error: transcript.error });
+        // }
         
         const result = await generateQuestions(transcript);
         res.json({ result });
@@ -159,6 +159,6 @@ app.post("/", async (req, res) => {
 
 app.listen(3001, () => console.log("Server running on http://localhost:3001"));
 
-app.get("/get-transcript", (req, res) => {
+app.get("/", (req, res) => {
     res.send("Hello World!");
 });
