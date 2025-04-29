@@ -4,6 +4,14 @@ let currentQuestion = 0;
 let score = 0;
 let incorrectAnswers = [];
 
+// Add a function to determine API base URL
+function getApiBaseUrl() {
+    // Use relative URL in production, localhost in development
+    return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3001' 
+        : '';
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('.quiz-container').classList.add('animate-in');
     document.querySelector('.link').classList.add('animate-in');
@@ -42,7 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             showToast("Generating questions...", "info");
-            const response = await fetch("https://get-yt-question-backend.vercel.app/get-transcript", {
+            const apiUrl = `${getApiBaseUrl()}/get-transcript`;
+            const response = await fetch(apiUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ videoId }),

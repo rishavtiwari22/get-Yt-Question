@@ -1,10 +1,27 @@
-import axios from "axios";
+export const getTranscript = async (videoId) => {
+  try {
+    const transcript = await getYouTubeTranscript(videoId);
+    return transcript;
+  } catch (error) {
+    console.error('Error fetching transcript:', error);
+    throw error;
+  }
+};
 
 export async function getYouTubeTranscript(videoId) {
     try {
         console.log("Fetching transcript for video ID:", videoId);
-        const response = await axios.get(`https://www.youtube.com/watch?v=${videoId}`);
-        const html = response.data;
+        const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const html = await response.text();
         
         // Try multiple methods to extract captions
         let captionsMatch = html.split('"captions":')[1]?.split(',"videoDetails')[0];
@@ -56,8 +73,11 @@ export async function getYouTubeTranscript(videoId) {
             return { error: "Transcripts not available" };
         }
         
-        const transcriptResponse = await axios.get(transcriptUrl);
-        const transcriptXml = transcriptResponse.data;
+        const transcriptResponse = await fetch(transcriptUrl);
+        if (!transcriptResponse.ok) {
+            throw new Error(`HTTP error! status: ${transcriptResponse.status}`);
+        }
+        const transcriptXml = await transcriptResponse.text();
         
         // More robust transcript extraction with better cleaning
         const transcriptSegments = [...transcriptXml.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)]

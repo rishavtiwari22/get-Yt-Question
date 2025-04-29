@@ -15,8 +15,8 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
 const schema = {
     description: "A list of multiple-choice questions generated from the given text.",
     type: "array",
-    minItems: 5,   // Reduced from 10 to 5
-    maxItems: 10,
+    minItems: 10,   // Reduced from 10 to 5
+    maxItems: 12,
     items: {
         type: "object",
         description: "A multiple-choice question with four options and one correct answer.",
@@ -50,18 +50,18 @@ const schema = {
 async function generateQuestions(transcript) {
     try {
         // Clean transcript further to improve processing
-        const cleanedTranscript = transcript
-            .replace(/(\w+)\s\1\s\1/g, '$1 $1') // Remove triple repeated words
-            .replace(/(\w+)\s\1/g, '$1')        // Remove double repeated words
-            .replace(/\s{2,}/g, ' ')           // Remove multiple spaces
-            .trim();
+        // const cleanedTranscript = transcript
+        //     .replace(/(\w+)\s\1\s\1/g, '$1 $1') // Remove triple repeated words
+        //     .replace(/(\w+)\s\1/g, '$1')        // Remove double repeated words
+        //     .replace(/\s{2,}/g, ' ')           // Remove multiple spaces
+        //     .trim();
         
         const model = genAI.getGenerativeModel({
             model: "gemini-1.5-pro",
             generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: schema,
-                temperature: 0.2,  // Slightly increased for more variety
+                temperature: 0.2, 
                 maxOutputTokens: 8000,
             },
         });
@@ -78,7 +78,7 @@ async function generateQuestions(transcript) {
         6. If the content is technical or specialized, include necessary context within the question.
         7. Avoid creating questions about ambiguous or unclear parts of the transcript.
 
-        Transcript: ${cleanedTranscript}
+        Transcript: ${transcript}
         
         Remember to create educational questions that test understanding of the content.`;
 
